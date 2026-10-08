@@ -1,4 +1,5 @@
 from app.models.account import BrokerAccount
+from app.models.allocation import TargetAllocation
 from app.models.asset import Asset
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.enums import (
@@ -24,6 +25,7 @@ __all__ = [
     "Holding",
     "Transaction",
     "FxRate",
+    "TargetAllocation",
     "BrokerProvider",
     "AssetClass",
     "AssetType",

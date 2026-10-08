@@ -7,6 +7,7 @@ from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.account import BrokerAccount
+    from app.models.allocation import TargetAllocation
 
 
 class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
@@ -45,6 +46,12 @@ class Portfolio(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     user: Mapped["User"] = relationship("User", back_populates="portfolios")
     accounts: Mapped[list["BrokerAccount"]] = relationship(
         "BrokerAccount",
+        back_populates="portfolio",
+        cascade="all, delete-orphan",
+        lazy="selectin",
+    )
+    targets: Mapped[list["TargetAllocation"]] = relationship(
+        "TargetAllocation",
         back_populates="portfolio",
         cascade="all, delete-orphan",
         lazy="selectin",

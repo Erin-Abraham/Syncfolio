@@ -1,3 +1,13 @@
+from app.schemas.drift import (
+    AssetClassDrift,
+    PortfolioDriftResponse,
+    RebalanceOrderRecommendation,
+    RebalancePlanRequest,
+    RebalancePlanResponse,
+    SetTargetAllocationsRequest,
+    TargetAllocationItem,
+    TargetAllocationResponse,
+)
 from app.schemas.health import (
     DatabaseHealthStatus,
     LivenessResponse,
@@ -34,4 +44,12 @@ __all__ = [
     "IngestionResultResponse",
     "HoldingResponse",
     "ReconciliationSummaryResponse",
+    "TargetAllocationItem",
+    "SetTargetAllocationsRequest",
+    "TargetAllocationResponse",
+    "AssetClassDrift",
+    "PortfolioDriftResponse",
+    "RebalanceOrderRecommendation",
+    "RebalancePlanRequest",
+    "RebalancePlanResponse",
 ]
