@@ -28,6 +28,12 @@ from app.schemas.ingestion import (
     ZerodhaIngestionRequest,
     ZerodhaTradeDTO,
 )
+from app.schemas.job import (
+    AsyncIngestCamsRequest,
+    AsyncIngestDriveWealthRequest,
+    AsyncIngestZerodhaRequest,
+    JobResponse,
+)
 
 __all__ = [
     "DatabaseHealthStatus",
@@ -52,4 +58,8 @@ __all__ = [
     "RebalanceOrderRecommendation",
     "RebalancePlanRequest",
     "RebalancePlanResponse",
+    "JobResponse",
+    "AsyncIngestCamsRequest",
+    "AsyncIngestZerodhaRequest",
+    "AsyncIngestDriveWealthRequest",
 ]

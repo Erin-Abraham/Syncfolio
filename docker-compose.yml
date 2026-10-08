@@ -20,12 +20,27 @@ services:
     networks:
       - syncfolio-net
 
+  redis:
+    image: redis:7-alpine
+    container_name: syncfolio_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - syncfolio-net
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: syncfolio_backend
     restart: unless-stopped
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
     env_file:
       - .env
     ports:
@@ -34,6 +49,8 @@ services:
       - ./backend:/app
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - syncfolio-net

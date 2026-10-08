@@ -11,6 +11,7 @@ from app.models.enums import (
 )
 from app.models.fx import FxRate
 from app.models.holding import Holding
+from app.models.job import IngestionJob, JobStatus
 from app.models.transaction import Transaction
 from app.models.user import Portfolio, User
 
@@ -26,6 +27,8 @@ __all__ = [
     "Transaction",
     "FxRate",
     "TargetAllocation",
+    "IngestionJob",
+    "JobStatus",
     "BrokerProvider",
     "AssetClass",
     "AssetType",

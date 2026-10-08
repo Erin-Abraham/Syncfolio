@@ -36,6 +36,12 @@ ENV/
 *.sqlite3
 pgdata/
 
+# Test & Coverage artifacts
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+
 # IDE & Editor caches
 .vscode/
 .idea/
