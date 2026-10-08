@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 import logging
+import time
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -48,14 +49,31 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-async def check_database_connection() -> dict[str, str]:
+async def check_database_connection() -> dict[str, object]:
     """
     Executes a low-overhead liveness probe to verify database connectivity.
-    Used by health check routers and container probes.
+    Measures roundtrip query latency and exposes connection pool statistics.
     """
+    start_time = time.perf_counter()
     async with async_session_factory() as session:
         result = await session.execute(text("SELECT 1"))
         scalar_val = result.scalar()
+        latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+
         if scalar_val == 1:
-            return {"status": "connected", "dialect": "postgresql+asyncpg"}
+            raw_pool = engine.pool
+            return {
+                "status": "connected",
+                "dialect": "postgresql+asyncpg",
+                "latency_ms": latency_ms,
+                "pool_size": raw_pool.size(),
+                "pool_checked_out": raw_pool.checkedout(),
+                "pool_overflow": raw_pool.overflow(),
+            }
         raise RuntimeError("Database probe returned unexpected response")
+
+
+async def dispose_database_engine() -> None:
+    """Closes all active pooled connections gracefully during application shutdown."""
+    logger.info("Disposing database connection pool...")
+    await engine.dispose()
