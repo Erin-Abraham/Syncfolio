@@ -10,8 +10,8 @@ logger = logging.getLogger("syncfolio.fx")
 
 # Default fallback spot reference rates if historical table entries are absent
 DEFAULT_FALLBACK_RATES: dict[tuple[CurrencyCode, CurrencyCode], Decimal] = {
-    (CurrencyCode.USD, CurrencyCode.INR): Decimal("83.500000"),
-    (CurrencyCode.INR, CurrencyCode.USD): Decimal("0.011976"),
+    (CurrencyCode.USD, CurrencyCode.INR): Decimal("96.880000"),
+    (CurrencyCode.INR, CurrencyCode.USD): Decimal("0.010322"),
 }
 
 
@@ -99,14 +99,14 @@ class FxService:
                 base_currency=CurrencyCode.USD,
                 quote_currency=CurrencyCode.INR,
                 rate_date=today,
-                rate=Decimal("83.500000"),
+                rate=Decimal("96.880000"),
                 source="RBI_REFERENCE",
             ),
             FxRate(
                 base_currency=CurrencyCode.INR,
                 quote_currency=CurrencyCode.USD,
                 rate_date=today,
-                rate=Decimal("0.011976"),
+                rate=Decimal("0.010322"),
                 source="RBI_REFERENCE",
             ),
         ]
