@@ -56,11 +56,17 @@ app = FastAPI(
 )
 
 # Cross-Origin Resource Sharing (CORS)
+# Explicit origin allow-list (a wildcard origin combined with credentials is unsafe).
+# Non-development environments allow no cross-origin browser access by default.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if settings.ENVIRONMENT == "development" else [],
+    allow_origins=(
+        ["http://localhost:3000", "http://127.0.0.1:3000"]
+        if settings.ENVIRONMENT == "development"
+        else []
+    ),
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
