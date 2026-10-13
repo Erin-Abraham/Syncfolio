@@ -3,11 +3,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
+import { NavigationDrawer } from "@/components/NavigationDrawer";
 import { NetWorthCard } from "@/components/NetWorthCard";
 import { AllocationChart } from "@/components/AllocationChart";
 import { DriftMatrix } from "@/components/DriftMatrix";
 import { TransactionLedger } from "@/components/TransactionLedger";
 import { IngestionModal } from "@/components/IngestionModal";
+import { Footer } from "@/components/Footer";
 import {
   fetchAllocations,
   fetchPortfolioSummary,
@@ -25,6 +27,7 @@ import {
 
 export default function DashboardPage() {
   const [currency, setCurrency] = useState<"INR" | "USD">("INR");
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isIngestionOpen, setIsIngestionOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
@@ -80,17 +83,28 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-blue-500/20 selection:text-blue-300">
-      {/* Top Navigation */}
+    <div className="min-h-screen bg-canvas text-on-surface selection:bg-brand-blue selection:text-text-primary">
+      {/* Slide-out Navigation Drawer */}
+      <NavigationDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onOpenIngestion={() => setIsIngestionOpen(true)}
+      />
+
+      {/* Top Navigation Bar */}
       <Navbar
         onOpenIngestion={() => setIsIngestionOpen(true)}
         onRefresh={() => loadDashboardData(true)}
         onReset={handleReset}
         isRefreshing={isRefreshing}
+        currency={currency}
+        onCurrencyChange={setCurrency}
+        fxRate={summary.fx_rate}
+        onToggleDrawer={() => setIsDrawerOpen(true)}
       />
 
       {/* Main Dashboard Container */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-7xl px-4 pt-20 pb-12 sm:px-6 lg:px-8">
         {/* Error Notification Banner */}
         {error && (
           <div className="mb-6 flex items-center justify-between rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-400">
@@ -111,22 +125,17 @@ export default function DashboardPage() {
         {isLoading && allocations.length === 0 ? (
           /* Skeletons Loading View */
           <div className="space-y-6 animate-pulse">
-            {/* Net Worth Skeleton */}
-            <div className="h-48 rounded-2xl border border-slate-800 bg-slate-900/50" />
-
-            {/* Grid Skeletons */}
+            <div className="h-48 rounded-xl border border-border-slate bg-surface-card/50" />
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-              <div className="h-96 rounded-2xl border border-slate-800 bg-slate-900/50 lg:col-span-5" />
-              <div className="h-96 rounded-2xl border border-slate-800 bg-slate-900/50 lg:col-span-7" />
+              <div className="h-96 rounded-xl border border-border-slate bg-surface-card/50 lg:col-span-5" />
+              <div className="h-96 rounded-xl border border-border-slate bg-surface-card/50 lg:col-span-7" />
             </div>
-
-            {/* Ledger Skeleton */}
-            <div className="h-80 rounded-2xl border border-slate-800 bg-slate-900/50" />
+            <div className="h-80 rounded-xl border border-border-slate bg-surface-card/50" />
           </div>
         ) : (
-          /* Live Dashboard View */
-          <div className="space-y-8">
-            {/* Metric Hero Card */}
+          /* Live Dashboard View matching Stitch Layout */
+          <div className="space-y-6">
+            {/* Hero Section: Consolidated Net Worth */}
             <NetWorthCard
               summary={summary}
               allocations={allocations}
@@ -134,9 +143,8 @@ export default function DashboardPage() {
               onCurrencyChange={setCurrency}
             />
 
-            {/* Allocation & Drift Analysis Section */}
-            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-              {/* Asset Allocation Chart */}
+            {/* Analytics Mid-Tier: 5-Col Donut Breakdown + 7-Col Drift Matrix */}
+            <section className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
               <div className="lg:col-span-5">
                 <AllocationChart
                   allocations={allocations}
@@ -145,7 +153,6 @@ export default function DashboardPage() {
                 />
               </div>
 
-              {/* Drift & Rebalancing Matrix */}
               <div className="lg:col-span-7">
                 <DriftMatrix
                   allocations={allocations}
@@ -153,9 +160,9 @@ export default function DashboardPage() {
                   fxRate={summary.fx_rate}
                 />
               </div>
-            </div>
+            </section>
 
-            {/* Transaction Ledger */}
+            {/* Holdings & Transaction Ledger Section */}
             <TransactionLedger
               transactions={transactions}
               currency={currency}
@@ -165,6 +172,9 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Institutional Footer */}
+      <Footer />
 
       {/* Statement Ingestion Dropzone Modal */}
       <IngestionModal

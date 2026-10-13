@@ -1,7 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CheckCircle2, FileUp, Layers, RefreshCw, Zap } from "lucide-react";
+import {
+  FileUp,
+  Globe2,
+  Menu,
+  RefreshCw,
+  RotateCcw,
+  User,
+  Zap,
+} from "lucide-react";
 import { checkSystemHealth } from "@/lib/api";
 import { SystemHealthStatus } from "@/types/portfolio";
 
@@ -10,6 +18,10 @@ interface NavbarProps {
   onRefresh?: () => void;
   onReset?: () => void;
   isRefreshing?: boolean;
+  currency?: "INR" | "USD";
+  onCurrencyChange?: (curr: "INR" | "USD") => void;
+  fxRate?: number;
+  onToggleDrawer?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -17,10 +29,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   onRefresh,
   onReset,
   isRefreshing = false,
+  currency = "INR",
+  onCurrencyChange,
+  fxRate = 96.88,
+  onToggleDrawer,
 }) => {
   const [health, setHealth] = useState<SystemHealthStatus>({
     status: "online",
-    latency_ms: 8,
+    latency_ms: 12,
   });
 
   useEffect(() => {
@@ -40,89 +56,131 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md transition-all">
+    <header className="fixed top-0 left-0 z-40 w-full border-b border-slate-800 bg-surface-card/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Brand Logo & Title */}
-        <div className="flex items-center space-x-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 shadow-lg shadow-blue-500/20 ring-1 ring-blue-400/30">
-            <Layers className="h-5 w-5 text-white" />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xl font-bold tracking-tight text-white">
+        {/* Left Side: Drawer Toggle & Brand */}
+        <div className="flex items-center gap-3">
+          {onToggleDrawer && (
+            <button
+              onClick={onToggleDrawer}
+              type="button"
+              title="Open Navigation Menu"
+              className="rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
+
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-tr from-brand-blue to-indigo-500 shadow-md ring-1 ring-blue-400/30">
+              <Zap className="h-4 w-4 text-white" />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-base font-bold tracking-tight text-text-primary">
                 Syncfolio
               </span>
-              <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[10px] font-semibold text-blue-400 ring-1 ring-inset ring-blue-500/30">
+              <span className="rounded border border-brand-blue/30 bg-brand-blue/20 px-1.5 py-0.5 text-[10px] font-bold uppercase text-brand-blue">
                 PRO
               </span>
             </div>
-            <p className="text-xs font-medium text-slate-400">
-              Institutional Multi-Asset Portfolio Engine
-            </p>
           </div>
         </div>
 
-        {/* Action Controls & Telemetry */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Live System Health Pill */}
-          <div className="hidden items-center space-x-2 rounded-full border border-slate-800 bg-slate-900/90 px-3 py-1.5 text-xs text-slate-300 shadow-inner sm:flex">
+        {/* Right Side: Telemetry & Actions */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* API Health Pill */}
+          <div className="hidden md:flex items-center gap-1.5 rounded-full border border-slate-800 bg-surface-container-lowest px-2.5 py-1 text-xs">
             <span className="relative flex h-2 w-2">
-              <span
-                className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${
-                  health.status === "online"
-                    ? "bg-emerald-400"
-                    : "bg-amber-400"
-                }`}
-              />
-              <span
-                className={`relative inline-flex h-2 w-2 rounded-full ${
-                  health.status === "online" ? "bg-emerald-500" : "bg-amber-500"
-                }`}
-              />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-gain-emerald opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-gain-emerald" />
             </span>
-            <span className="font-mono text-[11px] text-slate-400">
-              {health.status === "online" ? "API Live" : "Degraded"}
+            <span className="font-mono text-[11px] font-semibold text-gain-emerald">
+              API Live ({health.latency_ms ?? 12}ms)
             </span>
-            {health.latency_ms && (
-              <span className="text-[10px] text-slate-500">
-                ({health.latency_ms}ms)
-              </span>
+          </div>
+
+          {/* Live FX Pill */}
+          <div className="hidden lg:flex items-center gap-1.5 rounded-lg border border-slate-800 bg-surface-container-lowest px-2.5 py-1 text-xs">
+            <Globe2 className="h-3.5 w-3.5 text-text-secondary" />
+            <span className="font-mono text-[11px] text-text-primary">
+              1 USD = ₹{fxRate.toFixed(2)}
+            </span>
+            <span className="rounded bg-gain-emerald/10 px-1.5 py-0.2 font-mono text-[9px] font-bold uppercase text-gain-emerald">
+              LIVE FX
+            </span>
+          </div>
+
+          {/* Currency Toggle Pill */}
+          {onCurrencyChange && (
+            <div className="flex items-center rounded-lg border border-slate-800 bg-surface-card p-0.5">
+              <button
+                type="button"
+                onClick={() => onCurrencyChange("INR")}
+                className={`rounded px-2 py-0.5 font-mono text-xs font-semibold transition-all ${
+                  currency === "INR"
+                    ? "bg-brand-blue text-white shadow-sm"
+                    : "text-text-muted hover:text-text-primary"
+                }`}
+              >
+                INR (₹)
+              </button>
+              <button
+                type="button"
+                onClick={() => onCurrencyChange("USD")}
+                className={`rounded px-2 py-0.5 font-mono text-xs font-semibold transition-all ${
+                  currency === "USD"
+                    ? "bg-brand-blue text-white shadow-sm"
+                    : "text-text-muted hover:text-text-primary"
+                }`}
+              >
+                USD ($)
+              </button>
+            </div>
+          )}
+
+          {/* Refresh & Reset Controls */}
+          <div className="flex items-center gap-1">
+            {onRefresh && (
+              <button
+                type="button"
+                onClick={onRefresh}
+                disabled={isRefreshing}
+                title="Refresh Rates & Portfolio Data"
+                className="rounded-lg border border-slate-800 bg-surface-container-lowest p-1.5 text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary disabled:opacity-50"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+              </button>
+            )}
+
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                title="Reset portfolio data to default"
+                className="hidden sm:inline-flex rounded-lg border border-slate-800 bg-surface-container-lowest px-2.5 py-1 font-mono text-xs text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
+              >
+                Reset
+              </button>
             )}
           </div>
 
-          {/* Quick Refresh Button */}
-          {onRefresh && (
-            <button
-              onClick={onRefresh}
-              disabled={isRefreshing}
-              title="Refresh telemetry"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:border-slate-700 hover:text-white disabled:opacity-50 transition-colors"
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
-              />
-            </button>
-          )}
-
-          {/* Reset Baseline Button */}
-          {onReset && (
-            <button
-              onClick={onReset}
-              title="Reset portfolio data to baseline"
-              className="hidden sm:inline-flex items-center space-x-1 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1.5 text-xs text-slate-400 hover:border-slate-700 hover:text-white transition-colors"
-            >
-              <span>Reset</span>
-            </button>
-          )}
-
-          {/* Import Statement Button */}
+          {/* Import Statement CTA */}
           <button
+            type="button"
             onClick={onOpenIngestion}
-            className="group relative inline-flex items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-500 hover:shadow-blue-500/35 active:scale-[0.98]"
+            className="flex items-center gap-1.5 rounded-lg bg-brand-blue px-3 py-1.5 text-xs font-semibold text-white shadow-[0_0_12px_rgba(59,130,246,0.25)] transition-all hover:bg-brand-blue/90 active:scale-[0.98]"
           >
-            <FileUp className="h-4 w-4 transition-transform group-hover:-translate-y-0.5" />
-            <span>Import Statement</span>
+            <FileUp className="h-4 w-4" />
+            <span className="hidden sm:inline">Import Statement (CAS / Excel)</span>
+            <span className="sm:hidden">Import</span>
           </button>
+
+          {/* Profile Avatar */}
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-800 text-slate-300">
+            <User className="h-4 w-4" />
+          </div>
         </div>
       </div>
     </header>

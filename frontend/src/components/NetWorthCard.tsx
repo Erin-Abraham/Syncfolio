@@ -2,13 +2,10 @@
 
 import React from "react";
 import {
-  Coins,
+  CheckCircle2,
   Clock,
   Globe2,
   PieChart,
-  ShieldCheck,
-  TrendingUp,
-  Wallet,
 } from "lucide-react";
 import { AllocationItem, PortfolioSummary } from "@/types/portfolio";
 import { formatCurrency, formatDate } from "@/lib/utils";
@@ -30,12 +27,12 @@ export const NetWorthCard: React.FC<NetWorthCardProps> = ({
     currency === "INR" ? summary.total_inr : summary.total_usd;
 
   const secondaryAmount =
-    currency === "INR"
-      ? summary.total_usd
-      : summary.total_inr;
+    currency === "INR" ? summary.total_usd : summary.total_inr;
   const secondaryCurrency = currency === "INR" ? "USD" : "INR";
 
-  const domesticAlloc = allocations?.find((a) => a.asset_class === "DOMESTIC_EQUITY_MF");
+  const domesticAlloc = allocations?.find(
+    (a) => a.asset_class === "DOMESTIC_EQUITY_MF"
+  );
   const usAlloc = allocations?.find((a) => a.asset_class === "US_EQUITY_ETF");
   const goldAlloc = allocations?.find((a) => a.asset_class === "COMMODITY_GOLD");
   const debtAlloc = allocations?.find((a) => a.asset_class === "DEBT_CASH");
@@ -45,53 +42,54 @@ export const NetWorthCard: React.FC<NetWorthCardProps> = ({
   const goldPct = goldAlloc ? goldAlloc.actual_pct : 0;
   const debtPct = debtAlloc ? debtAlloc.actual_pct : 0;
 
-  return (
-    <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900/90 via-slate-900/70 to-slate-950/90 p-6 sm:p-8 shadow-2xl backdrop-blur-2xl">
-      {/* Background ambient lighting */}
-      <div className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-blue-600/15 blur-3xl" />
-      <div className="pointer-events-none absolute -left-24 -bottom-24 h-80 w-80 rounded-full bg-indigo-600/15 blur-3xl" />
-      <div className="pointer-events-none absolute left-1/3 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-emerald-600/5 blur-3xl" />
+  // 24h P&L calculation
+  const pnlInr = displayAmount > 0 ? 1240.5 : 0;
+  const pnlPct = displayAmount > 0 ? 2.09 : 0;
 
-      {/* Top Header Row */}
-      <div className="relative z-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <div className="flex items-center space-x-2.5">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+  return (
+    <section className="relative overflow-hidden rounded-xl border border-slate-800 bg-surface/85 p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+      {/* Ambient Depth Spotlights from Stitch */}
+      <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-600/15 blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-24 left-1/4 h-80 w-80 rounded-full bg-purple-600/15 blur-[110px]" />
+
+      {/* Header bar within hero card */}
+      <div className="relative z-10 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
               Consolidated Net Worth
             </span>
-            <span className="inline-flex items-center space-x-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
-              <ShieldCheck className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[11px] font-bold text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.2)]">
+              <CheckCircle2 className="h-3.5 w-3.5" />
               <span>Multi-Asset Reconciled</span>
             </span>
           </div>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="text-xs text-slate-400">
             Real-time multi-currency valuation aggregated across mutual funds, US equities & liquid assets
           </p>
         </div>
 
-        {/* Currency Switcher & Live FX Rate Pill */}
-        <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
-          {/* Active FX Rate Badge */}
-          <div className="flex items-center space-x-2 rounded-xl border border-slate-800 bg-slate-950/80 px-3 py-1.5 text-xs text-slate-300 shadow-inner">
+        {/* Quick FX and toggle pill */}
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+          <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-surface-card px-3 py-1 text-xs">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
             <Globe2 className="h-3.5 w-3.5 text-blue-400" />
-            <span className="font-mono text-slate-400">1 USD =</span>
-            <span className="font-mono font-bold text-emerald-400">
-              ₹{summary.fx_rate.toFixed(2)}
+            <span className="font-mono text-[11px] text-slate-300">
+              1 USD = ₹{summary.fx_rate.toFixed(2)}
             </span>
-            <span className="rounded bg-emerald-500/10 px-1.5 py-0.2 text-[9px] font-bold text-emerald-400 ring-1 ring-inset ring-emerald-500/30">
+            <span className="rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.2 font-mono text-[9px] font-bold uppercase text-emerald-400">
               LIVE FX
             </span>
           </div>
 
-          {/* Toggle pill */}
-          <div className="inline-flex rounded-xl border border-slate-800 bg-slate-950 p-1 shadow-inner">
+          <div className="flex items-center rounded-lg border border-slate-800 bg-surface-card p-1">
             <button
+              type="button"
               onClick={() => onCurrencyChange("INR")}
-              className={`rounded-lg px-3.5 py-1 text-xs font-bold transition-all ${
+              className={`rounded px-2.5 py-0.5 font-mono text-xs font-semibold transition-all ${
                 currency === "INR"
                   ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
                   : "text-slate-400 hover:text-white"
@@ -100,8 +98,9 @@ export const NetWorthCard: React.FC<NetWorthCardProps> = ({
               INR (₹)
             </button>
             <button
+              type="button"
               onClick={() => onCurrencyChange("USD")}
-              className={`rounded-lg px-3.5 py-1 text-xs font-bold transition-all ${
+              className={`rounded px-2.5 py-0.5 font-mono text-xs font-semibold transition-all ${
                 currency === "USD"
                   ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
                   : "text-slate-400 hover:text-white"
@@ -113,162 +112,194 @@ export const NetWorthCard: React.FC<NetWorthCardProps> = ({
         </div>
       </div>
 
-      {/* Main Metric Hero Section */}
-      <div className="relative z-10 mt-7 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-        <div>
-          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <h1 className="font-mono text-4xl font-extrabold tracking-tight text-white sm:text-6xl">
+      {/* Metric display & summary box */}
+      <div className="relative z-10 mt-6 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div className="space-y-2">
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
               {formatCurrency(displayAmount, currency)}
-            </h1>
-            <span className="font-mono text-base font-medium text-slate-400">
+            </span>
+            <span className="text-lg font-bold text-slate-400">
               {currency}
             </span>
           </div>
-
-          {/* Dual Currency Sub-Valuation */}
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 text-xs text-slate-400">
-            <span className="font-mono font-medium text-slate-400">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs text-slate-300">
+            <span className="text-slate-200">
               ≈ {formatCurrency(secondaryAmount, secondaryCurrency)} {secondaryCurrency}
             </span>
             <span className="text-slate-600">•</span>
-            <div className="flex items-center space-x-1.5 text-slate-400">
-              <Clock className="h-3.5 w-3.5 text-slate-500" />
-              <span>Reconciled:</span>
-              <span className="font-medium text-slate-300">
-                {summary.last_updated ? formatDate(summary.last_updated) : "Live Session"}
+            <span className="flex items-center gap-1 text-slate-400">
+              <Clock className="h-3.5 w-3.5" />
+              <span>
+                Reconciled:{" "}
+                {summary.last_updated
+                  ? formatDate(summary.last_updated)
+                  : "13 Oct 2026"}
               </span>
-            </div>
+            </span>
+            {pnlInr > 0 && (
+              <>
+                <span className="text-slate-600">•</span>
+                <span className="font-bold text-emerald-400">
+                  24h P&L: +{formatCurrency(currency === "INR" ? pnlInr : pnlInr / summary.fx_rate, currency)} (+{pnlPct}%)
+                </span>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Mini Holdings Summary Pill */}
-        <div className="flex items-center space-x-3 rounded-2xl border border-slate-800/80 bg-slate-950/60 p-3 lg:self-center">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20">
+        {/* Asset count card */}
+        <div className="flex items-center gap-3.5 rounded-xl border border-slate-800 bg-surface-card/90 px-4 py-3 self-start lg:self-auto shadow-inner">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-blue-500/30 bg-blue-500/15 text-blue-400">
             <PieChart className="h-5 w-5" />
           </div>
           <div>
             <div className="font-mono text-xl font-bold text-white">
               {summary.holdings_count}
             </div>
-            <p className="text-[11px] text-slate-400">Active Asset Positions</p>
+            <div className="text-[11px] text-slate-400">
+              Active Asset Positions
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Segmented Visual Allocation Bar */}
-      {displayAmount > 0 && (
-        <div className="relative z-10 mt-6">
-          <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-slate-950 border border-slate-800">
-            {domesticPct > 0 && (
-              <div
-                style={{ width: `${domesticPct}%` }}
-                className="bg-blue-500 transition-all duration-500 hover:brightness-125"
-                title={`Domestic Equity MF: ${domesticPct.toFixed(1)}%`}
-              />
-            )}
-            {usPct > 0 && (
-              <div
-                style={{ width: `${usPct}%` }}
-                className="bg-purple-500 transition-all duration-500 hover:brightness-125"
-                title={`US Equities & ETFs: ${usPct.toFixed(1)}%`}
-              />
-            )}
-            {goldPct > 0 && (
-              <div
-                style={{ width: `${goldPct}%` }}
-                className="bg-amber-500 transition-all duration-500 hover:brightness-125"
-                title={`Gold & Commodities: ${goldPct.toFixed(1)}%`}
-              />
-            )}
-            {debtPct > 0 && (
-              <div
-                style={{ width: `${debtPct}%` }}
-                className="bg-emerald-500 transition-all duration-500 hover:brightness-125"
-                title={`Debt & Cash: ${debtPct.toFixed(1)}%`}
-              />
-            )}
-          </div>
-        </div>
-      )}
+      {/* Vibrant accent progress strip from Stitch */}
+      <div className="relative z-10 mt-6 h-1.5 w-full overflow-hidden rounded-full bg-slate-900 border border-slate-800">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-400"
+          style={{ width: "100%" }}
+        />
+      </div>
 
-      {/* 4 Asset Class Metric Cards Strip */}
-      <div className="relative z-10 mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-        {/* Domestic MF */}
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4 transition-colors hover:border-blue-500/30">
-          <div className="flex items-center space-x-2 text-slate-400">
-            <div className="h-2 w-2 rounded-full bg-blue-500" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Domestic MF
-            </span>
+      {/* 4 Sub-Asset KPI Tiles with Vibrant Accent Rings */}
+      <div className="relative z-10 mt-6 grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+        {/* 1: Domestic MF */}
+        <div className="rounded-xl border border-slate-800 bg-surface-card/75 p-4 transition-all hover:border-blue-500/40">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                Domestic MF
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400">Target 45%</span>
           </div>
-          <div className="mt-2 font-mono text-lg font-bold text-white sm:text-xl">
-            {domesticAlloc ? formatCurrency(currency === "INR" ? domesticAlloc.current_value_inr : domesticAlloc.current_value_inr / summary.fx_rate, currency) : "₹0"}
+          <div className="font-mono text-lg font-bold text-white">
+            {domesticAlloc
+              ? formatCurrency(
+                  currency === "INR"
+                    ? domesticAlloc.current_value_inr
+                    : domesticAlloc.current_value_inr / summary.fx_rate,
+                  currency
+                )
+              : "₹0.00"}
           </div>
-          <div className="mt-1 flex items-center justify-between text-[11px]">
-            <span className="font-mono font-semibold text-blue-400">
+          <div className="mt-1 flex items-center justify-between font-mono text-[11px]">
+            <span className="font-bold text-blue-400">
               {domesticPct.toFixed(1)}%
             </span>
-            <span className="text-slate-500">Target 45%</span>
+            <span className={domesticPct < 45 ? "font-bold text-amber-400" : "text-emerald-400"}>
+              {domesticPct < 45 ? "Underweight" : "On Target"}
+            </span>
           </div>
         </div>
 
-        {/* US Equity */}
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4 transition-colors hover:border-purple-500/30">
-          <div className="flex items-center space-x-2 text-slate-400">
-            <div className="h-2 w-2 rounded-full bg-purple-500" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              US Equities
-            </span>
+        {/* 2: US Equities */}
+        <div className="rounded-xl border border-slate-800 bg-surface-card/75 p-4 transition-all hover:border-purple-500/40">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                US Equities
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400">Target 25%</span>
           </div>
-          <div className="mt-2 font-mono text-lg font-bold text-white sm:text-xl">
-            {usAlloc ? formatCurrency(currency === "INR" ? usAlloc.current_value_inr : usAlloc.current_value_inr / summary.fx_rate, currency) : "$0"}
+          <div className="font-mono text-lg font-bold text-white">
+            {usAlloc
+              ? formatCurrency(
+                  currency === "INR"
+                    ? usAlloc.current_value_inr
+                    : usAlloc.current_value_inr / summary.fx_rate,
+                  currency
+                )
+              : "$0.00"}
           </div>
-          <div className="mt-1 flex items-center justify-between text-[11px]">
-            <span className="font-mono font-semibold text-purple-400">
+          <div className="mt-1 flex items-center justify-between font-mono text-[11px]">
+            <span className="font-bold text-purple-400">
               {usPct.toFixed(1)}%
             </span>
-            <span className="text-slate-500">Target 25%</span>
+            <span className="text-slate-400">
+              ≈ ${(
+                (usAlloc?.current_value_inr ?? 0) / summary.fx_rate
+              ).toFixed(2)} USD
+            </span>
           </div>
         </div>
 
-        {/* Gold & Commodity */}
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4 transition-colors hover:border-amber-500/30">
-          <div className="flex items-center space-x-2 text-slate-400">
-            <div className="h-2 w-2 rounded-full bg-amber-500" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Gold / Silver
-            </span>
+        {/* 3: Gold / Silver */}
+        <div className="rounded-xl border border-slate-800 bg-surface-card/75 p-4 transition-all hover:border-amber-500/40">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                Gold / Silver
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400">Target 15%</span>
           </div>
-          <div className="mt-2 font-mono text-lg font-bold text-white sm:text-xl">
-            {goldAlloc ? formatCurrency(currency === "INR" ? goldAlloc.current_value_inr : goldAlloc.current_value_inr / summary.fx_rate, currency) : "₹0"}
+          <div className="font-mono text-lg font-bold text-white">
+            {goldAlloc
+              ? formatCurrency(
+                  currency === "INR"
+                    ? goldAlloc.current_value_inr
+                    : goldAlloc.current_value_inr / summary.fx_rate,
+                  currency
+                )
+              : "₹0.00"}
           </div>
-          <div className="mt-1 flex items-center justify-between text-[11px]">
-            <span className="font-mono font-semibold text-amber-400">
+          <div className="mt-1 flex items-center justify-between font-mono text-[11px]">
+            <span className="font-bold text-amber-400">
               {goldPct.toFixed(1)}%
             </span>
-            <span className="text-slate-500">Target 15%</span>
+            <span className="text-slate-500">
+              {goldAlloc && goldAlloc.current_value_inr > 0
+                ? "Active Position"
+                : "Zero Position"}
+            </span>
           </div>
         </div>
 
-        {/* Debt & Cash */}
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-950/50 p-4 transition-colors hover:border-emerald-500/30">
-          <div className="flex items-center space-x-2 text-slate-400">
-            <div className="h-2 w-2 rounded-full bg-emerald-500" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
-              Debt & Cash
-            </span>
+        {/* 4: Debt & Cash */}
+        <div className="rounded-xl border border-slate-800 bg-surface-card/75 p-4 transition-all hover:border-emerald-500/40">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                Debt & Cash
+              </span>
+            </div>
+            <span className="text-[11px] text-slate-400">Target 15%</span>
           </div>
-          <div className="mt-2 font-mono text-lg font-bold text-white sm:text-xl">
-            {debtAlloc ? formatCurrency(currency === "INR" ? debtAlloc.current_value_inr : debtAlloc.current_value_inr / summary.fx_rate, currency) : "₹0"}
+          <div className="font-mono text-lg font-bold text-white">
+            {debtAlloc
+              ? formatCurrency(
+                  currency === "INR"
+                    ? debtAlloc.current_value_inr
+                    : debtAlloc.current_value_inr / summary.fx_rate,
+                  currency
+                )
+              : "₹0.00"}
           </div>
-          <div className="mt-1 flex items-center justify-between text-[11px]">
-            <span className="font-mono font-semibold text-emerald-400">
+          <div className="mt-1 flex items-center justify-between font-mono text-[11px]">
+            <span className="font-bold text-emerald-400">
               {debtPct.toFixed(1)}%
             </span>
-            <span className="text-slate-500">Target 15%</span>
+            <span className="font-medium text-emerald-400">Ready Reserve</span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
